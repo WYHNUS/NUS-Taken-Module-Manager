@@ -37,7 +37,7 @@ $all_result_url = "https://myisis.nus.edu.sg/psc/cs90prd/EMPLOYEE/HRMS/c/SA_LEAR
 
 // url to retrieve specified semester exam result
 $sem_result_url = "https://myisis.nus.edu.sg/psc/cs90prd/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.N_SSR_SSENRL_GRADE.GBL";
-$sem_result_field = "ICAJAX=1&ICNAVTYPEDROPDOWN=0&ICType=Panel&ICElementNum=0&ICStateNum=13&ICAction=N_DERIVED_EXAM_SSR_PB_GO&ICXPos=0&ICYPos=39&ResponsetoDiffFrame=-1&TargetFrameName=None&FacetPath=None&ICFocus=&ICSaveWarningFilter=0&ICChanged=-1&ICResubmit=0&ICSID=obV2B6B3wRXLZhJ3GP%2B4KPtK1NxsAdKQzosY8l%2B8e3g%3D&ICActionPrompt=false&ICFind=&ICAddCount=&ICAPPCLSDATA=&SSR_DUMMY_RECV1\$sels\$0=";
+$sem_result_field = "ICAJAX=1&ICAction=N_DERIVED_EXAM_SSR_PB_GO&SSR_DUMMY_RECV1\$sels\$0=";
 
 $cookiefile = "cookie";
 $ch = curl_init();
@@ -48,21 +48,73 @@ if ($login_state) {
     $all_result_page = curl_get($ch, $all_result_url, $cookiefile);
     // parse dom tree
     $all_result_dom = str_get_html($all_result_page);
-    // number of semesters
-    $num_sem = 0;
-    foreach($all_result_dom->find('input') as $ele){
+    // store information for semester
+    $sem_index_array = array();
+    $sem_name_array = array();
+    foreach($all_result_dom->find("input") as $ele){
+        // only radio input are selectable semesters
+        /*
+            Each tr in term table (except th) has the following structure:
+                <tr>
+                    <td><div><input type="radio" .../></div></td>
+                    <td><div><span>*Semester Details*</span></div></td>
+                    ...
+                </tr>
+            
+        */
         if ($ele->type == "radio") {
-            error_log($ele->value.'<br>');
-            $num_sem += 1;
+            array_push($sem_index_array, $ele->value);
+            array_push($sem_name_array, $ele->parent()->parent()->next_sibling()->children(0)->children(0)->innertext);
         }
     }
+    $all_result_dom->clear();   // avoid memory leak
 
-    // crawl each page
-    // testing with page with index 1 (not working currently => require to login again even though cookie is enabled => require further investigation)
-    $sem_result_page = curl_post($ch, $sem_result_url, $sem_result_field."1", array(CURLOPT_COOKIEFILE => $cookiefile));
+    // crawl each exam result page
+    for ($i=0; $i<count($sem_index_array); $i++) {
+        /*
+            Individual semester page table information:
+            - table showing modules taken : id -> TERM_CLASSES$scroll$0
+                - inside its *child* table: 
+                    - first tr includes th
+                    - other tr has following structure:
+                        <tr>
+                            <td>
+                                <div><span>*ModuleCode*</span></div>
+                            </td>
+                            <td>
+                                <div><span>*ModuleTitle*</span></div>
+                            </td>
+                            <td>
+                                <div><span>*MSs*</span></div>
+                            </td>
+                            <td>
+                                <div><span>*Grade*</span></div>
+                            </td>
+                        </tr>
+        */
+        
+//        $sem_result_page = curl_post($ch, $sem_result_url, $sem_result_field.$sem_index_array[$i], array(CURLOPT_COOKIEFILE => $cookiefile));
+//        $sem_result_dom = str_get_html($sem_result_page);
+//        $module_table = $sem_result_dom->find("#TERM_CLASSES\$scroll\$0");
+    }
+    
+    
+
+    // simple_html_dom parser seems to stop working ... and I don't know why!!!
+    $sem_result_page = curl_post($ch, $sem_result_url, $sem_result_field.$sem_index_array[0], array(CURLOPT_COOKIEFILE => $cookiefile));
+//    var_dump($sem_result_page);
     $sem_result_dom = str_get_html($sem_result_page);
-    echo($sem_result_dom);
-
+//    $module_table = $sem_result_dom->find("#TERM_CLASSES\$scroll\$0")[0];
+    echo("from this point, nothing works and I don't know why ORZ -...- <br>");
+    foreach($sem_result_dom->find("field") as $ele) {
+        echo($ele->id."<br>");  // still working for first level
+        if ($ele->id == "win0divPAGECONTAINER") // working
+            foreach($ele->find("div") as $tmpdiv)   // magic?????????????????
+                echo("why not printing anything???");
+    }
+    echo("seriously?????");
+    
+    
 } else {
     echo("failed to login");
 }

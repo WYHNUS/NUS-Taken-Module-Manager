@@ -114,7 +114,55 @@ if ($login_state) {
     echo($module_text);
     
     // need to process $module_text further
-    
+    /* proposal: 
+        1. process module code out using regex
+        2. query using NUSMOD API to get Description as well as MCs
+        3. remove Description and MCs from $module_text
+        4. convert array to (module,grade) pair
+        5. print out table with th (Module ; Description ; MCs/Units ; Grade)
+        
+        OR
+        
+        1. process module code out using regex
+        2. process grade out using dictionary
+        3. process MCs out using regex
+        4. get Description last
+    */
+    /*
+        module grade dictionary:
+        A+      5.0
+        A       5.0
+        A-      4.5
+        B+      4.0
+        B       3.5
+        B-      3.0
+        C+      2.5
+        C       2.0
+        D+      1.5
+        D       1.0
+        F       0
+        no grade points are assigned:
+        CS
+        CU
+        EXE
+        IC
+        IP
+        S
+        U
+        W
+        
+        * explaination
+        Completed Satisfactorily/Completed Unsatisfactorily (CS/CU)
+        Exempted (EXE) 
+        Incomplete (IC)
+        In Progress (IP) 
+        Satisfactory/Unsatisfactory (S/U)
+        Withdrawn (W)
+        
+        CAP = sum ((module grade points) * 
+                   (the number of MCs for the corresponding module))
+              / (total number of MCs)
+    */
     
 } else {
     echo("failed to login");

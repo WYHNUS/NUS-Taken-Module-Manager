@@ -109,8 +109,8 @@ if ($login_state) {
     $start_str = "Official Grades Module Description MCs/Units Grade";
     $end_str = "Term Statistics";
     $module_text_start_index = strpos($trimed_text, $start_str) + strlen($start_str);
-    $module_text_length = strpos($trimed_text, $end_str) - $useful_text_start_index;
-    $module_text = substr($trimed_text, $module_text_start_index, $module_text_length)
+    $module_text_length = strpos($trimed_text, $end_str) - $module_text_start_index;
+    $module_text = substr($trimed_text, $module_text_start_index, $module_text_length);
     echo($module_text);
     
     // need to process $module_text further

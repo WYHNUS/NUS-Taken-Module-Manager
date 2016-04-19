@@ -100,19 +100,20 @@ if ($login_state) {
     
     
 
-    // simple_html_dom parser seems to stop working ... and I don't know why!!!
     $sem_result_page = curl_post($ch, $sem_result_url, $sem_result_field.$sem_index_array[0], array(CURLOPT_COOKIEFILE => $cookiefile));
-//    var_dump($sem_result_page);
-    $sem_result_dom = str_get_html($sem_result_page);
-//    $module_table = $sem_result_dom->find("#TERM_CLASSES\$scroll\$0")[0];
-    echo("from this point, nothing works and I don't know why ORZ -...- <br>");
-    foreach($sem_result_dom->find("field") as $ele) {
-        echo($ele->id."<br>");  // still working for first level
-        if ($ele->id == "win0divPAGECONTAINER") // working
-            foreach($ele->find("div") as $tmpdiv)   // magic?????????????????
-                echo("why not printing anything???");
-    }
-    echo("seriously?????");
+
+    // use text processing to extract information
+    $raw_text = strip_tags($sem_result_page);
+    // replace multiple spaces with one
+    $trimed_text = preg_replace('!\s+!', ' ', $raw_text);
+    $start_str = "Official Grades Module Description MCs/Units Grade";
+    $end_str = "Term Statistics";
+    $module_text_start_index = strpos($trimed_text, $start_str) + strlen($start_str);
+    $module_text_length = strpos($trimed_text, $end_str) - $useful_text_start_index;
+    $module_text = substr($trimed_text, $module_text_start_index, $module_text_length)
+    echo($module_text);
+    
+    // need to process $module_text further
     
     
 } else {

@@ -156,12 +156,22 @@ class NUSModuleCrawler {
                 $module_info = explode(" ", trim($modules_info_array[$i+1]));
                 $info_len = count($module_info);
                 
-                $module = array(
-                    "code" => $modules_code[0][$i],
-                    "name" => implode(" ", array_slice($module_info, 0, -2)),
-                    "MC" => $module_info[$info_len - 2],
-                    "grade" => $module_info[$info_len - 1]
-                );
+                // hard-coded to fix &nbsp error for last element
+                if ($i != $num_modules_taken-1) {
+                    $module = array(
+                        "code" => $modules_code[0][$i],
+                        "name" => implode(" ", array_slice($module_info, 0, -2)),
+                        "MC" => $module_info[$info_len - 2],
+                        "grade" => $module_info[$info_len - 1]
+                    );
+                } else {
+                    $module = array(
+                        "code" => $modules_code[0][$i],
+                        "name" => implode(" ", array_slice($module_info, 0, -3)),
+                        "MC" => $module_info[$info_len - 3],
+                        "grade" => $module_info[$info_len - 2]
+                    );
+                }
                 array_push($modules_taken, $module);
             }
         }

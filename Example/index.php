@@ -5,7 +5,7 @@
 	 if (isset($_POST["send"])) {
 	 	$crawler = new NUSModuleCrawler($_POST["matric_num"], $_POST["pwd"]);
 	 	$takenModules = $crawler->run();
-	 	print_r($takenModules);
+	 	$semNum = count($takenModules);
 	 }
 ?>
 
@@ -25,4 +25,36 @@
 		<input id="nus-password" name="pwd" id="pwd" type="password" required/>
 		<input name="send" id="send" type="submit" value="Retrieve" />
 	</form>
+
+	<div>
+    <?php for ($i=0; $i<$semNum; $i++) {?>
+		<div>
+			<h3><?php echo $takenModules[$i]["semester"] ?></h3>
+			<table>
+				<thead>
+	                <tr>
+	                    <td>#</td>
+	                    <td class="course-header course-id">Course ID</td>
+	                    <td class="course-header course-title">Course Title</td>
+	                    <td class="course-header course-mc">MCs</td>
+	                    <td class="course-header course-grade">Grade</td>
+	                </tr>
+	            </thead>
+	            <?php 
+	            	$moduleNum = count($takenModules[$i]["module_info"]);
+	            	for ($j=0; $j<$moduleNum; $j++) {
+	            ?>
+	            <tr>
+	                <td><?php echo ($j+1) ?></td>
+	                <td><?php echo $takenModules[$i]["module_info"][$j]["code"] ?></td>
+	                <td><?php echo $takenModules[$i]["module_info"][$j]["name"] ?></td>
+	                <td><?php echo $takenModules[$i]["module_info"][$j]["MC"] ?></td>
+	                <td><?php echo $takenModules[$i]["module_info"][$j]["grade"] ?></td>
+	            </tr>
+	            <?php } ?>
+	            </table>
+			</table>
+			</div>
+	<?php } ?>
+	</div>
 </body>

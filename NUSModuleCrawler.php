@@ -74,7 +74,6 @@ class NUSModuleCrawler {
 
                 // process $module_text further based on information given in nus official website: http://www.nus.edu.sg/registrar/edu/modular.html
                 $modules_taken = $this->parse_module($module_text);
-                echo(modules_taken);
                 array_push($all_modules_taken, array("semester" => $sem_name_array[$i],
                                                      "module_info" => $modules_taken));
             }
